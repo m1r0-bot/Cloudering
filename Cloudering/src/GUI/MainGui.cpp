@@ -1,0 +1,134 @@
+#include "MainGui.h"
+#include "../tools/FileLoader.h"
+
+MainGui::MainGui(Window &window) : window(window) {
+
+    const char* glsl_version = "#version 330";
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowPadding.x = 3;
+    style.WindowPadding.y = 3;
+
+    ImGui_ImplGlfw_InitForOpenGL(window.window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+    //frameBuffer = new FrameBuffer(rendererSize.x, rendererSize.y);
+    //renderer = &Renderer::getInstance();
+    //renderer->Init(frameBuffer, &camera);
+}
+
+
+void MainGui::MainLoop(double deltaTime) {
+    InitializeNewFrame();
+
+    RendererFrame();
+    MainControlPanel();
+
+    DrawImGuiUI();
+}
+
+void MainGui::InitializeNewFrame()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    // Create the docking environment
+    ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
+        ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_MenuBar;
+
+
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size);
+    ImGui::SetNextWindowViewport(viewport->ID);
+    ImGui::GetStyle().WindowRounding = 0.0f;
+
+    if (ImGui::Begin("InvisibleWindowDock", nullptr, windowFlags)) {
+
+        MainMenuBar();
+
+        ImGuiID dockSpaceId = ImGui::GetID("InvisibleWindowDock");
+        ImGui::DockSpace(dockSpaceId, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
+        static auto first_time = true;
+        if (first_time)
+        {
+            first_time = false;
+
+            ImGui::DockBuilderRemoveNode(dockSpaceId); // clear any previous layout
+            ImGui::DockBuilderAddNode(dockSpaceId, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_NoUndocking);
+            ImGui::DockBuilderSetNodeSize(dockSpaceId, ImGui::GetIO().DisplaySize);
+
+            ImGuiID left_dock_id;
+            ImGuiID right_dock_id;
+            ImGui::DockBuilderSplitNode(dockSpaceId, ImGuiDir_Right, 0.2f, &right_dock_id, &left_dock_id);
+
+            ImGui::DockBuilderDockWindow("Control Panel", right_dock_id);
+            ImGui::DockBuilderDockWindow("Renderer", left_dock_id);
+            ImGui::DockBuilderFinish(dockSpaceId);
+        }
+    }ImGui::End();
+}
+
+
+void MainGui::MainMenuBar() {
+    if (ImGui::BeginMenuBar()) {
+        static std::string scenario = "Scenario 1";
+        if (ImGui::BeginMenu(scenario.c_str())) {
+            if (ImGui::MenuItem("Scenario 1", nullptr)) {
+                scenario = "Scenario 1";
+            }
+            if (ImGui::MenuItem("Scenario 2", nullptr)) {
+                scenario = "Scenario 2";
+            }
+            if (ImGui::MenuItem("Scenario 3", nullptr)) {
+                scenario = "Scenario 3";
+            }
+            ImGui::EndMenu();
+        }
+    }ImGui::EndMenuBar();
+}
+
+void MainGui::MainControlPanel() {
+    if(ImGui::Begin("Control Panel")) {
+
+    } 
+    ImGui::End();
+}
+
+void MainGui::RendererFrame() {
+    ImGuiWindowClass window_class1;
+    window_class1.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoDockingOverMe;
+    window_class1.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoDockingOverOther;
+    window_class1.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoTabBar;
+    ImGui::SetNextWindowClass(&window_class1);
+
+    static ImVec2 lastRendererScale = ImVec2(0, 0);
+    if (ImGui::Begin("Renderer")) {
+
+    }
+    ImGui::End();
+}
+
+void MainGui::DrawImGuiUI() {
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        glfwMakeContextCurrent(backup_current_context);
+    }
+}
