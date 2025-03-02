@@ -31,8 +31,72 @@ void MainGui::MainLoop(double deltaTime) {
     RendererFrame();
     MainControlPanel();
 
+    ShowSidebar( v );
+
     DrawImGuiUI();
 }
+
+void MainGui::ShowSidebar(std::vector<Component>& components) {
+    ImGui::Begin("Inspector Sidebar", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+    for (size_t i = 0; i < components.size(); ) {
+        ImGui::PushID(static_cast<int>(i)); // Unique ID for each component
+
+        // Get current position for the header
+        ImVec2 headerStart = ImGui::GetCursorScreenPos();
+        float buttonSize = 20.0f;
+
+        // Manually position the "X" button before the header
+        ImGui::SetCursorScreenPos(ImVec2(headerStart.x + ImGui::GetContentRegionAvail().x - buttonSize - 5, headerStart.y+2));
+        bool remove = ImGui::SmallButton("X");
+
+        // Get the rectangle bounds of the button
+        ImVec2 buttonMin = ImGui::GetItemRectMin();
+        ImVec2 buttonMax = ImGui::GetItemRectMax();
+
+        // Move cursor back to the original position for header
+        ImGui::SetCursorScreenPos(headerStart);
+
+        // Block the collapsing header toggle if clicking on the button
+        bool hovered = ImGui::IsMouseHoveringRect(buttonMin, buttonMax);
+        bool open = ImGui::CollapsingHeader(components[i].name.c_str(), ImGuiTreeNodeFlags_DefaultOpen | (hovered ? ImGuiTreeNodeFlags_AllowItemOverlap : 0));
+
+        if (remove) {
+            components.erase(components.begin() + i);
+            ImGui::PopID();
+            continue; // Skip further processing for this item
+        }
+
+        // Drag Source (Make component draggable)
+        if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+            ImGui::SetDragDropPayload("COMPONENT_MOVE", &i, sizeof(size_t)); // Send index as payload
+            ImGui::Text("Move %s", components[i].name.c_str());
+            ImGui::EndDragDropSource();
+        }
+
+        // Drag Target (Accept drag-and-drop to reorder)
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("COMPONENT_MOVE")) {
+                size_t draggedIndex = *(size_t*)payload->Data;
+                if (draggedIndex != i) {
+                    std::swap(components[draggedIndex], components[i]);
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        if (open) {
+            ImGui::Text("Component Content Goes Here...");
+        }
+
+        ImGui::PopID();
+        ++i;
+    }
+
+    ImGui::End();
+}
+
+
 
 void MainGui::InitializeNewFrame()
 {
@@ -101,7 +165,21 @@ void MainGui::MainMenuBar() {
 
 void MainGui::MainControlPanel() {
     if(ImGui::Begin("Control Panel")) {
+        for (int i = 0; i < M1Gui::GUIComponents.size(); i++) {
+            M1Gui::GUIComponents[i]->RenderUI();
+        }
 
+        if (ImGui::Button("Add Component"))
+        {
+            ImGui::OpenPopup("ComponentPopup"); // Open the popup
+        }
+
+        if (ImGui::BeginPopup("ComponentPopup"))
+        {
+            if (ImGui::MenuItem("Camera")) { M1Gui::GUIComponents.push_back(BlockFactory::create(CAMERA)); }
+            if (ImGui::MenuItem("Shader")) { M1Gui::GUIComponents.push_back(BlockFactory::create(SHADER)); }
+            ImGui::EndPopup();
+        }
     } 
     ImGui::End();
 }

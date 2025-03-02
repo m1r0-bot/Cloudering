@@ -109,7 +109,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;Shell32.lib;jsoncpp_static.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;Shell32.lib;jsoncpp_static.lib;comdlg32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)vendor\glfw-3.4.bin.WIN64\lib-vc2022\;$(ProjectDir)vendor\jsoncpp-1.9.6\lib\Debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -128,11 +128,16 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;Shell32.lib;jsoncpp_static.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;Shell32.lib;jsoncpp_static.lib;comdlg32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)vendor\glfw-3.4.bin.WIN64\lib-vc2022\;$(ProjectDir)vendor\jsoncpp-1.9.6\lib\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\core\Shader.cpp" />
+    <ClCompile Include="src\core\ShaderProgram.cpp" />
+    <ClCompile Include="src\GUI\customBlocks\Block.cpp" />
+    <ClCompile Include="src\GUI\customBlocks\BlockFactory.cpp" />
+    <ClCompile Include="src\GUI\customBlocks\M1Gui.cpp" />
     <ClCompile Include="src\GUI\MainGui.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\tools\FileLoader.cpp" />
@@ -146,6 +151,13 @@
     <ClCompile Include="vendor\ImGui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\Shader.h" />
+    <ClInclude Include="src\core\ShaderProgram.h" />
+    <ClInclude Include="src\GUI\customBlocks\Block.h" />
+    <ClInclude Include="src\GUI\customBlocks\BlockFactory.h" />
+    <ClInclude Include="src\GUI\customBlocks\Camera_Block.h" />
+    <ClInclude Include="src\GUI\customBlocks\Shader_Block.h" />
+    <ClInclude Include="src\GUI\customBlocks\M1Gui.h" />
     <ClInclude Include="src\GUI\MainGui.h" />
     <ClInclude Include="src\GUI\Window.h" />
     <ClInclude Include="src\tools\FileLoader.h" />
