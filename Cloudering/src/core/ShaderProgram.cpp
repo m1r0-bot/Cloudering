@@ -3,7 +3,10 @@
 
 
 void ShaderProgram::CreateShaderProgram() {
-	if (!vert.isSelected || !frag.isSelected) return;
+	if (!vert.isSelected || !frag.isSelected) {
+		std::cout << "missing vertex and fragment shaders!!" << std::endl;
+		return;
+	}
 
 	bool tes = tesc.isSelected && tese.isSelected;
 	bool geo = geom.isSelected;
@@ -37,6 +40,7 @@ void ShaderProgram::CreateShaderProgram() {
 	if (geo) glDeleteShader(geomShader);
 	glDeleteShader(fragShader);
 
+	glDeleteProgram(pid);
 	pid = shaderProgram;
 }
 
@@ -70,4 +74,10 @@ void ShaderProgram::RenderUI() {
 	tese.RenderUI();
 	geom.RenderUI();
 	frag.RenderUI();
+
+	if (ImGui::Button("Compile")) {
+		CreateShaderProgram();
+	}
+	ImGui::SameLine();
+	ImGui::Text("pid: %u", pid);
 }

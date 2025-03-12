@@ -7,13 +7,14 @@ class Shader_Block : public Block {
 public:
 	void RenderUI() override {
 		ImGui::PushID(getId());
-		static bool destroy;
-		if (M1Gui::MovableCollapsingHeader(displayName.c_str(), getId(), &destroy)) {
+		bool destroy = false;
+		if (M1Gui::MovableCollapsingHeader(displayName, getId(), &destroy, &isRenaming)) {
 			sp.RenderUI();
 		}
-
+		if (destroy) M1Gui::QueueToDestroy(getId());
 		ImGui::PopID();
 	}
+
 
 	Json::Value Serialize() const override {
 		Json::Value json;

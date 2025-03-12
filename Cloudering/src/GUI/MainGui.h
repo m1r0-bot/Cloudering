@@ -8,6 +8,8 @@
 #include <imgui_internal.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <fstream>
+#include <json/json.h>
 
 struct Component {
 	std::string name;
@@ -28,7 +30,7 @@ private:
 	void RendererFrame();
 	void DrawImGuiUI();
 
-
-	void ShowSidebar(std::vector<Component>& components);
-	std::vector<Component> v = { {"first"}, {"second"}, {"third"}, {"fourth"} };
+	void HandleKeyBinds();
+	void SaveProjectToJSON();
+	void LoadProjectFromJson();
 };

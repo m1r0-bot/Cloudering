@@ -24,6 +24,10 @@ public:
 	virtual EnumBlockType GetType() const = 0;
 	int getId() { return id; }
 
-	static void ResetId() { nextId = 1; }
+	static void ResetId() { nextId = 0; }
+
+
+
+	bool isRenaming = false;
 
 };

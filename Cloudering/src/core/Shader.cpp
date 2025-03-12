@@ -14,9 +14,10 @@ void Shader::Deserialize(const Json::Value& json) {
 		throw std::runtime_error("Invalid JSON format");
 
 	path = json["shaderPath"].asString();
+	isSelected = !path.empty();
+
 	type = static_cast<GLenum>(json["shaderType"].asInt());
 }
-
 
 std::string Shader::LoadShaderSource() {
 

@@ -6,13 +6,14 @@ class Camera_Block : public Block {
 public:
 	void RenderUI() override {
 		ImGui::PushID(getId());
-		static bool destroy = false;
+		bool destroy = false;
 		if (M1Gui::MovableCollapsingHeader(name, getId(), &destroy)) {
 			ImGui::InputFloat3("position", pos.data());
 			ImGui::InputFloat3("rotation", rotation.data());
 			ImGui::Spacing();
 			ImGui::SliderFloat("FOV", &FOV, 1, 180);
 		}
+		if (destroy) M1Gui::QueueToDestroy(getId());
 		ImGui::PopID();
 	}
 

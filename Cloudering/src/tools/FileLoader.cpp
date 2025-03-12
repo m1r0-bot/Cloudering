@@ -5,6 +5,10 @@
 #include <stdexcept>
 #include <iostream>
 #include <string>
+#include <filesystem>
+
+#include <windows.h>
+#include <string>
 
 bool FileLoader::LoadJSON(Json::Value &root, std::string filePath) {
     std::ifstream file(filePath);
@@ -19,6 +23,8 @@ bool FileLoader::LoadJSON(Json::Value &root, std::string filePath) {
 
 std::string FileLoader::OpenFileDialog(std::string preferedType)
 {
+    std::filesystem::path oldPath = std::filesystem::current_path();
+
     OPENFILENAME ofn;
     wchar_t szFile[MAX_PATH] = { 0 };
 
@@ -50,11 +56,15 @@ std::string FileLoader::OpenFileDialog(std::string preferedType)
     ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
     ofn.lpstrTitle = L"Select a Shader File";
 
+    std::string selectedPath;
     if (GetOpenFileName(&ofn) == TRUE)
     {
-        return WStringToString(szFile);
+        selectedPath = WStringToString(szFile);
     }
-    return "";
+
+    std::filesystem::current_path(oldPath);
+
+    return selectedPath;
 }
 
 std::string FileLoader::WStringToString(const std::wstring& wstr)

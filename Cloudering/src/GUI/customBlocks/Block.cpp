@@ -1,3 +1,3 @@
 #include "Block.h"
 
-int Block::nextId = 1;
+int Block::nextId = 0;

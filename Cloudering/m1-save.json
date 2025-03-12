@@ -1,0 +1,40 @@
+{
+	"components" : 
+	[
+		{
+			"type" : 0
+		},
+		{
+			"displayName" : "edge Shader",
+			"shaderProgram" : 
+			{
+				"frag" : 
+				{
+					"shaderPath" : "C:\\Users\\m1r0\\Documents\\GitHub\\ml-intro\\ml-intro\\resources\\shaders\\edgeShader.frag\u0000",
+					"shaderType" : 35632
+				},
+				"geom" : 
+				{
+					"shaderPath" : "",
+					"shaderType" : 36313
+				},
+				"tesc" : 
+				{
+					"shaderPath" : "",
+					"shaderType" : 36488
+				},
+				"tese" : 
+				{
+					"shaderPath" : "",
+					"shaderType" : 36487
+				},
+				"vert" : 
+				{
+					"shaderPath" : "C:\\Users\\m1r0\\Documents\\GitHub\\ml-intro\\ml-intro\\resources\\shaders\\edgeShader.vert\u0000",
+					"shaderType" : 35633
+				}
+			},
+			"type" : 1
+		}
+	]
+}
