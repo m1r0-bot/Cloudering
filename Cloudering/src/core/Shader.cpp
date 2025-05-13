@@ -1,42 +1,34 @@
 #include "Shader.h"
 
-Json::Value Shader::Serialize() const {
-	 Json::Value json;
 
-	 json["shaderPath"] = path;
-	 json["shaderType"] = static_cast<int>(type);
+std::string Shader::LoadShaderSource(const std::string& filePath) {
+	std::ifstream file(filePath);
+	if (!file.is_open()) {
+		std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << filePath << std::endl;
+		return "";
+	}
 
-	 return json;
-}
-
-void Shader::Deserialize(const Json::Value& json) {
-	if (!json.isMember("shaderPath") || !json.isMember("shaderType"))
-		throw std::runtime_error("Invalid JSON format");
-
-	path = json["shaderPath"].asString();
-	isSelected = !path.empty();
-
-	type = static_cast<GLenum>(json["shaderType"].asInt());
-}
-
-std::string Shader::LoadShaderSource() {
-
-	std::ifstream shaderFile(path);
 	std::stringstream shaderStream;
-
-	if (shaderFile) {
-		shaderStream << shaderFile.rdbuf();
-		shaderFile.close();
+	std::string line;
+	while (std::getline(file, line)) {
+		if (line.find("#include") != std::string::npos) {
+			size_t firstQuote = line.find('\"');
+			size_t lastQuote = line.find('\"', firstQuote + 1);
+			if (firstQuote != std::string::npos && lastQuote != std::string::npos) {
+				std::string includePath = line.substr(firstQuote + 1, lastQuote - firstQuote - 1);
+				std::string includeFullPath = std::filesystem::path(path).parent_path().string() + "/" + includePath;
+				shaderStream << LoadShaderSource(includeFullPath);  // Recursive include
+			}
+		}
+		else {
+			shaderStream << line << '\n';
+		}
 	}
-	else {
-		std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << path << std::endl;
-	}
-
 	return shaderStream.str();
 }
 
 GLuint Shader::CompileShader() {
-	std::string source = LoadShaderSource();
+	std::string source = LoadShaderSource(path);
 	GLuint shader = glCreateShader(type);
 	const char* src = source.c_str();
 	glShaderSource(shader, 1, &src, NULL);
@@ -52,23 +44,4 @@ GLuint Shader::CompileShader() {
 	}
 
 	return shader;
-}
-
-void Shader::RenderUI() {
-	size_t pos = path.find_last_of("\\");
-	std::string name = (pos == std::string::npos) ? "no " + Type2Str(type) + " file" : path.substr(pos + 1);
-
-	pos = name.find_last_of(".");
-	std::string ext = (pos == std::string::npos) ? "" : name.substr(pos);
-
-	auto width = std::min(150.0f, ImGui::GetContentRegionAvail().x - 30);
-	if (ImGui::Button(name.c_str(), ImVec2(width, 17))) {
-
-	}
-	ImGui::SameLine();
-	if (ImGui::SmallButton(("+##" + Type2Str(type)).c_str())) {
-		SelectShader();
-	}
-	ImGui::SameLine();
-	ImGui::Text("(%s)", ext.c_str());
 }

@@ -1,52 +1,25 @@
 #pragma once
 #include <string>
 #include <glad/glad.h>
-#include <json/json.h>
-#include "../tools/FileLoader.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include "imgui.h"
+#include <filesystem>
 
 
 class Shader {
 public:
-	Shader(GLenum ShaderType) : type(ShaderType) {}
-	void SelectShader() {
-		path = FileLoader::OpenFileDialog(Type2Str(type));
-		isSelected = !path.empty();
+	Shader(std::string path, GLenum type) : path(path), type(type){
+		pid = CompileShader();
 	}
-
-	void RemoveShader() {
-		path = "";
-		isSelected = false;
+	~Shader() {
+		glDeleteShader(pid);
 	}
-
-	Json::Value Serialize() const;
-	void Deserialize(const Json::Value& json);
-	GLuint CompileShader();
-	void RenderUI();
-
-	bool isSelected = false;
-	std::string path = "";
-	GLenum type;
+	GLuint pid;
 private:
-	std::string LoadShaderSource();
+	GLuint CompileShader();
+	std::string LoadShaderSource(const std::string& filePath);
 
-	std::string Type2Str(GLenum shaderType) {
-		switch (shaderType) {
-		case GL_VERTEX_SHADER:
-			return "vert";
-		case GL_TESS_CONTROL_SHADER:
-			return "tesc";
-		case GL_TESS_EVALUATION_SHADER:
-			return "tese";
-		case GL_GEOMETRY_SHADER:
-			return "geom";
-		case GL_FRAGMENT_SHADER:
-			return "frag";
-		default:
-			return "";
-		}
-	}
+	std::string path;
+	GLenum type;
 };

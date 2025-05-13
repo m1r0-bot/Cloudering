@@ -18,10 +18,6 @@ MainGui::MainGui(Window &window) : window(window) {
 
     ImGui_ImplGlfw_InitForOpenGL(window.window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
-
-    //frameBuffer = new FrameBuffer(rendererSize.x, rendererSize.y);
-    //renderer = &Renderer::getInstance();
-    //renderer->Init(frameBuffer, &camera);
 }
 
 
@@ -33,8 +29,7 @@ void MainGui::MainLoop(double deltaTime) {
 
     DrawImGuiUI();
     
-    M1Gui::DestroyQueuedComponents();
-    HandleKeyBinds();
+    HandleShortcuts();
 }
 
 void MainGui::InitializeNewFrame()
@@ -86,39 +81,38 @@ void MainGui::InitializeNewFrame()
 
 void MainGui::MainMenuBar() {
     if (ImGui::BeginMenuBar()) {
-        static std::string scenario = "Scenario 1";
+        static std::string scenario = "Select Scenario";
         if (ImGui::BeginMenu(scenario.c_str())) {
-            if (ImGui::MenuItem("Scenario 1", nullptr)) {
-                scenario = "Scenario 1";
+            if (ImGui::MenuItem("TEST Triangle")) {
+                scenario = "TEST Triangle";
+                ScenarioFactory::setCurrentScene(TEST);
             }
-            if (ImGui::MenuItem("Scenario 2", nullptr)) {
-                scenario = "Scenario 2";
+            if (ImGui::MenuItem("Dobashi 2000")) {
+                scenario = "Dobashi 2000";
+                ScenarioFactory::setCurrentScene(METABALLS);
             }
-            if (ImGui::MenuItem("Scenario 3", nullptr)) {
-                scenario = "Scenario 3";
+            if (ImGui::MenuItem("SkyDome")) {
+                scenario = "SkyDome";
+                ScenarioFactory::setCurrentScene(SKYDOME);
+            }
+            if (ImGui::MenuItem("Horizon Zero Dawn")) {
+                scenario = "Horizon Zero Dawn";
+                ScenarioFactory::setCurrentScene(HORIZON_0_DAWN);
             }
             ImGui::EndMenu();
         }
+
+        if (ScenarioFactory::isSelectedScenario()) {
+            ScenarioFactory::currentScenario.get()->RenderMenuItems();
+        }
+
     }ImGui::EndMenuBar();
 }
 
 void MainGui::MainControlPanel() {
     if(ImGui::Begin("Control Panel")) {
-        for (int i = 0; i < M1Gui::GUIComponents.size(); i++) {
-            M1Gui::GUIComponents[i]->RenderUI();
-        }
-        ImGui::NewLine();
-        if (ImGui::Button("Add Component"))
-        {
-            ImGui::OpenPopup("ComponentPopup"); // Open the popup
-        }
-
-        if (ImGui::BeginPopup("ComponentPopup"))
-        {
-            if (ImGui::MenuItem("Camera")) { M1Gui::GUIComponents.push_back(BlockFactory::create(CAMERA)); }
-            if (ImGui::MenuItem("Shader")) { M1Gui::GUIComponents.push_back(BlockFactory::create(SHADER)); }
-            ImGui::EndPopup();
-        }
+        if(ScenarioFactory::isSelectedScenario())
+            ScenarioFactory::currentScenario.get()->RenderControlerGUI();
     } 
     ImGui::End();
 }
@@ -130,9 +124,15 @@ void MainGui::RendererFrame() {
     window_class1.DockNodeFlagsOverrideSet |= ImGuiDockNodeFlags_NoTabBar;
     ImGui::SetNextWindowClass(&window_class1);
 
-    static ImVec2 lastRendererScale = ImVec2(0, 0);
     if (ImGui::Begin("Renderer")) {
+        ImVec2 size = ImGui::GetContentRegionAvail();
+        MouseCameraHandeler();
+        Renderer::getInstance().RenderScene(size.x, size.y);
 
+        ImGui::Image(
+        (ImTextureID)Renderer::getInstance().getTexture(),
+        size
+        );
     }
     ImGui::End();
 }
@@ -150,48 +150,53 @@ void MainGui::DrawImGuiUI() {
     }
 }
 
-void MainGui::HandleKeyBinds() {
+void MainGui::MouseCameraHandeler()
+{
+    Camera& camera = Camera::getInstance();
+    static bool isDragging = false;
+    static POINT dragStartPos;
+
+    POINT mousePos;
+    if (!GetCursorPos(&mousePos)) {
+        mousePos.x = mousePos.y = 0;
+    }
+
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
+    {
+        if (!isDragging && !ImGui::IsAnyItemActive() &&
+            ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
+        {
+            ShowCursor(FALSE);
+            dragStartPos = mousePos;
+            isDragging = true;
+        }
+        else if (isDragging) {
+            camera.processMouseDelta(vec2(mousePos.x - dragStartPos.x, mousePos.y - dragStartPos.y) * .05f);
+            SetCursorPos(dragStartPos.x, dragStartPos.y);
+        }
+    }
+    else if (isDragging)
+    {
+        SetCursorPos(dragStartPos.x, dragStartPos.y);
+        isDragging = false;
+        ShowCursor(TRUE);
+    }
+
+    if (isDragging || ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem)) {
+        camera.processMouseScroll(ImGui::GetIO().MouseWheel);
+    }
+    if (ImGui::IsKeyDown(ImGuiKey_W)) camera.processKeyboardInput(vec3(0, 0, 1));
+    if (ImGui::IsKeyDown(ImGuiKey_A)) camera.processKeyboardInput(vec3(-1, 0, 0));
+    if (ImGui::IsKeyDown(ImGuiKey_S)) camera.processKeyboardInput(vec3(0, 0, -1));
+    if (ImGui::IsKeyDown(ImGuiKey_D)) camera.processKeyboardInput(vec3(1, 0, 0));
+    if (ImGui::IsKeyDown(ImGuiKey_Space)) camera.processKeyboardInput(vec3(0, -1, 0));
+    if (ImGui::IsKeyDown(ImGuiKey_C) || ImGui::IsKeyDown(ImGuiKey_LeftShift)) camera.processKeyboardInput(vec3(0, 1, 0));
+}
+
+void MainGui::HandleShortcuts() {
     ImGuiIO& io = ImGui::GetIO();
 
     if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_S, false)) {
-        SaveProjectToJSON();
+        //SaveProjectToJSON();
     }
-
-    if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_L, false)) {
-        LoadProjectFromJson();
-    }
-}
-
-void MainGui::SaveProjectToJSON() {
-    Json::Value root;
-
-    root["components"] = M1Gui::ComponentsToJSON();
-
-    Json::StreamWriterBuilder builder;
-    const std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
-
-    std::ofstream file("m1-save.json");
-    if (!file) {
-        std::cerr << "Error: Could not open save.json for writing!\n";
-        return;
-    }
-
-    writer->write(root, &file);
-    std::cout << "Project successfully saved to save.json\n";
-
-}
-
-void MainGui::LoadProjectFromJson() {
-    Json::Value root;
-    if (!FileLoader::LoadJSON(root, "m1-save.json")) {
-        std::cerr << "couldn't load requested json file!" << std::endl;
-        return;
-    }
-
-    if (!root.isMember("components")) {
-        std::cerr << "incorrect save file format. missing <components>" << std::endl;
-        return;
-    }
-    
-    M1Gui::JSONToComponents(root["components"]);
 }

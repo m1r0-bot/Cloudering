@@ -1,15 +1,15 @@
 #pragma once
 #include <glad/glad.h>
 #include "Window.h"
-#include "customBlocks/BlockFactory.h"
-#include "customBlocks/M1Gui.h"
+#include "../core/renderer/Renderer.h"
+#include "../scenarios/ScenarioFactory.h"
 #include <vector>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <fstream>
-#include <json/json.h>
+#include <windows.h>
 
 struct Component {
 	std::string name;
@@ -30,7 +30,6 @@ private:
 	void RendererFrame();
 	void DrawImGuiUI();
 
-	void HandleKeyBinds();
-	void SaveProjectToJSON();
-	void LoadProjectFromJson();
+	void MouseCameraHandeler();
+	void HandleShortcuts();
 };

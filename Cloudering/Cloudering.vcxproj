@@ -136,11 +136,18 @@
   <ItemGroup>
     <ClCompile Include="src\core\Shader.cpp" />
     <ClCompile Include="src\core\ShaderProgram.cpp" />
-    <ClCompile Include="src\GUI\customBlocks\Block.cpp" />
-    <ClCompile Include="src\GUI\customBlocks\BlockFactory.cpp" />
-    <ClCompile Include="src\GUI\customBlocks\M1Gui.cpp" />
     <ClCompile Include="src\GUI\MainGui.cpp" />
+    <ClCompile Include="src\core\renderer\FrameBuffer.cpp" />
+    <ClCompile Include="src\core\renderer\Renderer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\scenarios\Horizon\HorizonZeroDawn.cpp" />
+    <ClCompile Include="src\scenarios\Nishita-Dobashi\CellularAutomaton.cpp" />
+    <ClCompile Include="src\scenarios\Nishita-Dobashi\NishitaDobashi_Scenario.cpp" />
+    <ClCompile Include="src\scenarios\Noise\PerlinNoise.h" />
+    <ClCompile Include="src\scenarios\Noise\WorleyNoise.h" />
+    <ClCompile Include="src\scenarios\ScenarioFactory.cpp" />
+    <ClCompile Include="src\scenarios\SkyDome\SkyDome.cpp" />
+    <ClCompile Include="src\scenarios\TestTriangle\TestTriangle.cpp" />
     <ClCompile Include="src\tools\FileLoader.cpp" />
     <ClCompile Include="vendor\glad\src\glad.c" />
     <ClCompile Include="vendor\ImGui\backends\imgui_impl_glfw.cpp" />
@@ -152,16 +159,24 @@
     <ClCompile Include="vendor\ImGui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\core\renderer\Camera.h" />
     <ClInclude Include="src\core\Shader.h" />
     <ClInclude Include="src\core\ShaderProgram.h" />
-    <ClInclude Include="src\GUI\customBlocks\Block.h" />
-    <ClInclude Include="src\GUI\customBlocks\BlockFactory.h" />
-    <ClInclude Include="src\GUI\customBlocks\Camera_Block.h" />
-    <ClInclude Include="src\GUI\customBlocks\Shader_Block.h" />
-    <ClInclude Include="src\GUI\customBlocks\M1Gui.h" />
     <ClInclude Include="src\GUI\MainGui.h" />
+    <ClInclude Include="src\core\renderer\FrameBuffer.h" />
+    <ClInclude Include="src\core\renderer\Renderer.h" />
     <ClInclude Include="src\GUI\Window.h" />
+    <ClInclude Include="src\scenarios\Horizon\HorizonTextureGen.h" />
+    <ClInclude Include="src\scenarios\Horizon\HorizonZeroDawn.h" />
+    <ClInclude Include="src\scenarios\Nishita-Dobashi\CellularAutomaton.h" />
+    <ClInclude Include="src\scenarios\Nishita-Dobashi\NishitaDobashi_Scenario.h" />
+    <ClInclude Include="src\scenarios\Noise\Noise.h" />
+    <ClInclude Include="src\scenarios\Scenario.h" />
+    <ClInclude Include="src\scenarios\ScenarioFactory.h" />
+    <ClInclude Include="src\scenarios\SkyDome\SkyDome.h" />
+    <ClInclude Include="src\scenarios\TestTriangle\TestTriangle.h" />
     <ClInclude Include="src\tools\FileLoader.h" />
+    <ClInclude Include="src\tools\ScriptLoader.h" />
     <ClInclude Include="vendor\ImGui\backends\imgui_impl_glfw.h" />
     <ClInclude Include="vendor\ImGui\backends\imgui_impl_opengl3.h" />
     <ClInclude Include="vendor\ImGui\backends\imgui_impl_opengl3_loader.h" />

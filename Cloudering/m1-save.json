@@ -5,7 +5,8 @@
 			"type" : 0
 		},
 		{
-			"displayName" : "edge Shader",
+			"displayName" : "Edge Shader",
+			"id" : 1,
 			"shaderProgram" : 
 			{
 				"frag" : 
@@ -35,6 +36,61 @@
 				}
 			},
 			"type" : 1
+		},
+		{
+			"currentLink" : "1##shaderProgram",
+			"displayName" : "Mesh",
+			"id" : 2,
+			"selectedMesh" : 
+			{
+				"meshType" : 0,
+				"positions" : 
+				[
+					-1.0,
+					-1.0,
+					-1.0,
+					1.0,
+					-1.0,
+					-1.0,
+					1.0,
+					1.0,
+					-1.0,
+					-1.0,
+					1.0,
+					-1.0
+				]
+			},
+			"type" : 2
+		},
+		{
+			"displayName" : "Script",
+			"id" : 3,
+			"path" : "C:\\Users\\m1r0\\Documents\\GitHub\\Cloudering\\Cloudering\\saves\\myScript.cpp\u0000",
+			"type" : 3
+		},
+		{
+			"currentLink" : "1##shaderProgram",
+			"displayName" : "Uniforms",
+			"id" : 4,
+			"type" : 4,
+			"variables" : 
+			[
+				{
+					"data" : 
+					[
+						0.31299999356269836,
+						0.51999998092651367,
+						0.74000000953674316
+					],
+					"dim" : 3,
+					"globalLink" : "",
+					"id" : 5,
+					"isConstant" : true,
+					"max" : 1.0,
+					"min" : 0.0,
+					"uniformName" : "position"
+				}
+			]
 		}
 	]
 }

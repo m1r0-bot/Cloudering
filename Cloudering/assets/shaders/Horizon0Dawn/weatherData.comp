@@ -1,0 +1,83 @@
+#version 430
+
+layout (local_size_x = 8, local_size_y = 8) in;
+
+layout(rgba32f, binding = 0) uniform image2D noiseTexture;
+
+#define TWO_PI 6.28318530718
+
+float rand (vec2 st) {
+    return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);
+}
+
+vec2 rand2angle(vec2 p) 
+{
+    float r = rand(p) * TWO_PI;
+    return vec2(cos(r), sin(r));
+}
+
+vec2 hash22(vec2 p) 
+{
+    vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.xx + p3.yz) * p3.zy);
+}
+
+float Perlin(vec2 p, float scale)
+{
+    vec2 i = floor(p * scale);
+    vec2 f = fract(p * scale);
+    
+    vec2 c00 = rand2angle(mod(i + vec2(0., 0.), scale));
+    vec2 c01 = rand2angle(mod(i + vec2(0., 1.), scale));
+    vec2 c10 = rand2angle(mod(i + vec2(1., 0.), scale));
+    vec2 c11 = rand2angle(mod(i + vec2(1., 1.), scale));
+    
+    vec2 p00 = f - vec2(0., 0.);
+    vec2 p01 = f - vec2(0., 1.);
+    vec2 p10 = f - vec2(1., 0.);
+    vec2 p11 = f - vec2(1., 1.);
+    
+    vec2 u = f*f*(3.0-2.0*f);
+    
+    float a = mix(dot(c00, p00), dot(c01, p01), u.y);
+    float b = mix(dot(c10, p10), dot(c11, p11), u.y);
+    
+    return mix(a, b, u.x);
+}
+
+float dots(vec2 p, float scale){
+    vec2 i = floor(p * scale);
+    vec2 f = fract(p * scale);
+    
+    float o = 10.;
+    
+    for (float y = -1.; y <= 1.; y++){
+        for (float x = -1.; x <= 1.; x++){
+            vec2 off = vec2(x, y);
+            vec2 r = hash22(mod(i + off, scale)) + off - f;
+            
+            float d = dot(r, r);
+            
+            o = min(o, d);
+        }
+    }
+    return (1.-o);// * step(o, 0.1);
+}
+
+void main()
+{
+    ivec2 id = ivec2(gl_GlobalInvocationID.xy);
+    vec2 uv = vec2(id) / (gl_NumWorkGroups * gl_WorkGroupSize).xy;
+    
+    float p = Perlin(uv, 7.)*.5+.5;
+    float p2 = Perlin(uv+7., 10.)*.5+.5;
+    float p3 = Perlin(uv+17.5, 15.)*.5+.5;
+    float d = dots(uv, 10.);
+    
+    vec4 colOut = vec4(d, p, .5, 1.);
+    //vec4 colOut = vec4(p2, p, .5, 1.);
+    //vec4 colOut = vec4(p2, p, mix(p3, d, .5), 1.);
+
+    imageStore(noiseTexture, id, colOut);
+}
