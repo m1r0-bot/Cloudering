@@ -38,4 +38,7 @@ private:
 	float ext_f = 0.01;
 
 	std::vector<std::unique_ptr<Noise>> noises;
+
+	// This is just to make the class diagram show the dependency
+	Noise* _noises;
 };

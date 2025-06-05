@@ -9,7 +9,7 @@ HorizonZeroDawn::HorizonZeroDawn() {
 	};
 
 	GLuint vbo;
-	glCreateBuffers(1, &vbo);
+	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, far_plane.size() * sizeof(float), far_plane.data(), GL_STATIC_DRAW);
 
@@ -40,6 +40,9 @@ void HorizonZeroDawn::RenderControlerGUI() {
 	if (ImGui::CollapsingHeader("SkyDome")) {
 		ImGui::DragFloat3("Sun Position", &sunPos[0], 0.1, 0, 0, "%.1f");
 	}
+	if (ImGui::CollapsingHeader("clouds")) {
+		ImGui::ColorPicker3("Sun Color", &sunCol[0]);
+	}
 }
 
 void HorizonZeroDawn::RenderScene() {
@@ -57,11 +60,12 @@ void HorizonZeroDawn::RenderScene() {
 	glUniform1i(glGetUniformLocation(shaderProgram, "highFreqNoises"), 1);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, weatherData);
-	glUniform1i(glGetUniformLocation(shaderProgram, "weatherData"), 2);
+	glUniform1i(glGetUniformLocation(shaderProgram, "weatherDataTex"), 2);
 
 
 	vec3 sunDir = glm::normalize(sunPos);
 	glUniform3f(glGetUniformLocation(shaderProgram, "SunDir"), sunDir.x, sunDir.y, sunDir.z);
+	glUniform3f(glGetUniformLocation(shaderProgram, "SunCol"), sunCol.x, sunCol.y, sunCol.z);
 
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

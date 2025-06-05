@@ -29,33 +29,30 @@ vec4 Cloud_RayMarch(vec3 ro, vec3 rd){
 
     t1 = min(t1, 80000.);
     b1 = min(b1, 80000.);
-    float step_size = abs(t1 - b1) / float(CLOUD_VOLUME_STEPS);
+    float step_size = abs(t1 - b1) / float(CLOUD_VOLUME_STEPS + 1);
     if (step_size < 1.) return vec4(.0);
 
     vec3 p = ro + rd * b1;
     vec3 step = rd * step_size;
+    p += step*0.5;
 
     float extinction = 1.;
     vec3 scattering = vec3(0.);
 
-    float density = .0;
     float cloud_test = .0;
     int zero_density_sample_count = 0;
 
     for(int i = 0; i < CLOUD_VOLUME_STEPS; i++){
         
         vec3 weather_data = texture2D(weatherDataTex, fract(cubeMapUV(p)*100.)).rgb;
-        //if (cloud_test > .0){
-        if (true){
+        if (cloud_test > ZERO){
             float sampled_density = SampleCloudDensity(p, weather_data, false);
-            sampled_density = clamp(sampled_density, .0, 1.);
             float fade = 1.0 - smoothstep(10000.0, 80000.0, distance(ro, p));
             sampled_density *= fade;
-            if (sampled_density == 0){
+            if (sampled_density <= ZERO){
                 zero_density_sample_count += 1;
             }
             if (zero_density_sample_count < 6){
-                density += sampled_density * step_size;
                 if (sampled_density > .0){
 
                     extinction *= exp(-EXTINCTION_F * sampled_density * step_size);
@@ -63,7 +60,7 @@ vec4 Cloud_RayMarch(vec3 ro, vec3 rd){
                     float light_extinction = SampleCloudDensityAlongRay(p, SunDir * RAYMARCH_TO_SUN_SIZE);
                     
 
-                    vec3 step_scattering = SCATTERING_F * sampled_density * step_size * light_extinction * vec3(1.);
+                    vec3 step_scattering = SCATTERING_F * sampled_density * step_size * light_extinction * SunCol;
                     scattering += extinction * step_scattering;
 
                     if(extinction < 0.001) break;
@@ -77,8 +74,11 @@ vec4 Cloud_RayMarch(vec3 ro, vec3 rd){
         } 
         else {
             cloud_test = SampleCloudDensity(p, weather_data, true);
-            if(cloud_test == .0){
-                p += step;
+            if(cloud_test <= ZERO){
+                p += step * 2.;
+                i++;
+            } else {
+            i--;
             }
         }
     }
@@ -95,7 +95,6 @@ void main() {
     //guerrila games inspired clouds
     vec4 clouds = Cloud_RayMarch(ro, rd);
 
-    //vec3 skybox = mix(skyColor, clouds.rgb, 1.-clouds.a);
     vec3 skybox = mix(clouds.rgb, skyColor, clouds.a);
 
     FragColor = vec4(skybox, 1.);

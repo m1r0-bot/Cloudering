@@ -19,7 +19,7 @@ public:
 		};
 
 		GLuint VBO;
-		glCreateBuffers(1, &VBO);
+		glGenBuffers(1, &VBO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(float), points.data(), GL_STATIC_DRAW);
 

@@ -13,6 +13,7 @@ out vec4 FragColor;
 #define BETA_R vec3(3.8e-6, 13.5e-6, 33.1e-6) 
 #define BETA_M vec3(21e-6) 
 #define DELTA 0.001
+#define MAP_SCALE 750.0
 
 
 //uniform mat4 view; //to get relative camera position
@@ -148,13 +149,12 @@ float remap(float orig_val, float orig_min, float orig_max, float new_min, float
 }
 
 float map(vec2 uv) {
-    float w = Worley_FBM(uv);
+    float w = Worley_FBM(uv*25.);
     float p = Perlin_FBM(uv);
 
     float f = remap(p, -(1.-w), 1., 0., 1.);
     
-    //return smoothstep( cloudMin, cloudMax, f);
-    return clamp(cloudMax * (f-cloudMin * 1.)/(1.-cloudMin), 0., 1.);
+    return remap(f, cloudMin, cloudMax, .0, 1.);
 }
 
 vec3 approximateNormal(vec2 p) {
@@ -172,13 +172,13 @@ float selfShadowing(vec2 ro){
     
     float ext = 1.;
     for (float f = 0.; f < RAYMARCH_2SUN_COUNT; f++){
-        //ro += sunDir.xz * RAYMARCH_2SUN_SIZE;
+        ro += sunDir.xz * RAYMARCH_2SUN_SIZE / MAP_SCALE;
         float cloudDensity = map(ro);
         ext *= exp(-EXTINCTION_F * cloudDensity * RAYMARCH_2SUN_SIZE);
         if(ext < 0.001) break;
     }
 
-    return clamp(ext, .0, 1.);
+    return 1.-clamp(ext, .0, 1.);
 }
 
 vec4 computeClouds(vec3 ro, vec3 rd){
@@ -187,7 +187,7 @@ vec4 computeClouds(vec3 ro, vec3 rd){
     
     vec3 sPos = ro + rd * t1;
 
-    vec2 p = cubeMapUV(normalize(sPos)) * 750.;
+    vec2 p = cubeMapUV(normalize(sPos)) * MAP_SCALE;
     
     float noise = map(p);
     //return vec4(noise * min(1., 5000./length(sPos - ro)));
@@ -195,18 +195,16 @@ vec4 computeClouds(vec3 ro, vec3 rd){
     
     vec3 n = approximateNormal(p);
 
-    float h = noise;
-
 
     float Lt = clamp(dot(n, sunDir)*L, 0., 1.);
     float Ls = clamp(pow(k1 + k2 * dot(rd, sunDir), m) * L, 0., 1.);
     float Sh = selfShadowing(p);
 
     float F = (Ls + Lt) * Sh;
-    F = clamp(.0, 1., F);
+    F = clamp(F, .0, 1.);
     
-    float horizon = min(1., 5000./length(sPos - ro));
-    return vec4(vec3(F), 1.-Sh) * horizon;
+    float horizon = smoothstep(40000., 5000., length(sPos - ro));
+    return vec4(vec3(F), Sh) * horizon;
 }
 
 bool isGround(vec3 ro, vec3 rd) {

@@ -17,10 +17,11 @@
 #define CLOUD_DENSITY .01
 #define EXTINCTION_F .1
 #define SCATTERING_F .0001
+#define ZERO .0000001
 
 
 //raymarch constants
-#define CLOUD_VOLUME_STEPS 50
+#define CLOUD_VOLUME_STEPS 100
 #define SUN_IN_SCATTERING_STEPS 6
 #define RAYMARCH_TO_SUN_SIZE 1000.
 
@@ -32,6 +33,7 @@
 uniform mat4 view;
 
 uniform vec3 SunDir;
+uniform vec3 SunCol;
 
 //textures
 uniform sampler3D lowFreqNoises;

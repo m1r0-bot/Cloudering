@@ -29,4 +29,7 @@ private:
 
 	float width = 1920;
 	float height = 1080;
+
+	// This is just to make the class diagram show the dependency
+	ScenarioFactory *get_Instance;
 };

@@ -9,7 +9,7 @@ SkyDome::SkyDome() {
 	};
 
 	GLuint vbo;
-	glCreateBuffers(1, &vbo);
+	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, far_plane.size() * sizeof(float), far_plane.data(), GL_STATIC_DRAW);
 
@@ -30,9 +30,9 @@ SkyDome::SkyDome() {
 }
 
 void SkyDome::GenerateNoises() {
-	noises.push_back(std::make_unique<PerlinNoise>(1024, 1024, glm::vec4(40., 100., 150., 200.), true));
+	noises.push_back(std::make_unique<PerlinNoise>(1024, 1024, glm::vec4(40., 80., 160., 320.), true));
 	noises.back().get()->GenerateTexture();
-	noises.push_back(std::make_unique<WorleyNoise>(1024, 1024, glm::vec4(50., 75., 100., 150.), true));
+	noises.push_back(std::make_unique<WorleyNoise>(1024, 1024, glm::vec4(20., 40., 80., 160.), true));
 	noises.back().get()->GenerateTexture();
 }
 

@@ -108,7 +108,7 @@ float Worley_FBM(vec3 p, float scale){
         scale *= 2.;
         amp *= 0.4;
     }
-    return o;
+    return 1.-o;
 }
 
 float Perlin_FBM(vec3 p, float scale){
@@ -123,11 +123,11 @@ float Perlin_FBM(vec3 p, float scale){
     return o;
 }
 
-float PerlinWorley(vec3 p){
-    float worley = Worley_FBM(p, 11.);
-    float perlin = Perlin(p, 5.)*.5+.5;
+float PerlinWorley(vec3 p, float scale){
+    float perlin = Perlin(p, scale)*.5+.5;
+    float worley = Worley_FBM(p, scale*2.);
 
-    return remap(perlin, -(1.-worley), 1., 0., 1.);
+    return remap(perlin, -worley, 1., 0., 1.);
 }
 
 
@@ -138,7 +138,7 @@ void main()
     
     vec4 noises = vec4(0.);
     
-    noises.r = PerlinWorley(uvw);
+    noises.r = PerlinWorley(uvw, 5.);
     noises.g = Worley_FBM(uvw, 8.);
     noises.b = Worley_FBM(uvw, 16.);
     noises.a = Worley_FBM(uvw, 32.);

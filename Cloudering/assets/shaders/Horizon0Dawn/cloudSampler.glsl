@@ -27,28 +27,26 @@ float GetHightDensity(vec3 p, float type){
 }
 
 
-//ignoring vec3 weather_data for now as I dont know how to create a similiar texture for now
 float SampleCloudDensity(vec3 p, vec3 weather_data, bool cheapSample) {
     vec4 lowFreqTex = texture(lowFreqNoises, fract(p*0.0001)).rgba;
 
     float lowFreqFBM = (lowFreqTex.g * 0.625) + (lowFreqTex.b * 0.25) + (lowFreqTex.a * 0.125);
 
     float base_cloud = Remap( lowFreqTex.r, -(1. - lowFreqFBM), 1. , 0., 1. );
-
-    float cloud_tyoe = weather_data.b;
-    float densityHeightGradient = GetHightDensity(p, cloud_tyoe);
-
-    base_cloud *= densityHeightGradient;
-
-    float coverage = weather_data.r;
     
+    float coverage = weather_data.r;
+    float cloud_density = weather_data.g;
+    float cloud_type = weather_data.b;
+
+    float densityHeightGradient = GetHightDensity(p, cloud_type);
     base_cloud = Remap(base_cloud, coverage, 1., 0., 1.) * coverage;
     
-    //if (cheapSample) {
-        //return base_cloud * CLOUD_DENSITY;
-    //}
+    base_cloud *= densityHeightGradient;
+    if (cheapSample) {
+         return base_cloud * cloud_density;
+    }
 
-    vec3 highFreqTex = texture(highFreqNoises, fract(p*.00001)).rgb;
+    vec3 highFreqTex = texture(highFreqNoises, fract(p*.0002)).rgb;
 
     float highFreqFBM = (highFreqTex.r * 0.625) + (highFreqTex.g * 0.25) + (highFreqTex.b * 0.125);
 
@@ -56,11 +54,11 @@ float SampleCloudDensity(vec3 p, vec3 weather_data, bool cheapSample) {
 
     float high_freq_noise_modifier = mix(highFreqFBM, 1.-highFreqFBM, clamp(height_fraction * 10., 0., 1.));
 
-    float final_cloud = Remap(base_cloud, high_freq_noise_modifier * .5, 1., 0., 1.);
+    float final_cloud = Remap(base_cloud, high_freq_noise_modifier*.3, 1., 0., 1.);
 
-    return final_cloud * CLOUD_DENSITY;
+    return final_cloud * cloud_density;
 
-    //todo: wind_offset and curl_noise (after it will finally render correctly);
+    //todo: wind_offset and curl_noise;
     
 }
 

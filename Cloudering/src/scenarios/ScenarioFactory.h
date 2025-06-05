@@ -14,4 +14,7 @@ private:
 	static std::unordered_map<EnumScenario, std::shared_ptr<Scenario>> cache;
 	static std::shared_ptr<Scenario> Create(EnumScenario scenario);
 
+	// This is just to make the class diagram show the dependency
+	Scenario *currentscenario;
+
 };

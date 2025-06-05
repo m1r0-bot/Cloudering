@@ -28,7 +28,7 @@ void NishitaDobashi_Scenario::RenderScene() {
 	static std::vector<Metaball> cloudVoxels = {};
 	if (ImGui::IsKeyPressed(ImGuiKey_N, true))
 	{
-		ca.TimeStep();
+		ca.TimeStep(); //ca is Cellular Automaton
 
 		cloudVoxels = ca.getAllCldPos();
 

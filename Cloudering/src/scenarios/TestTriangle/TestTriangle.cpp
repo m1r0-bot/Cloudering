@@ -14,12 +14,12 @@ TestTriangle::TestTriangle() {
 	};
 
 	GLuint points_vbo;
-	glCreateBuffers(1, &points_vbo);
+	glGenBuffers(1, &points_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
 	glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(float), points.data(), GL_STATIC_DRAW);
 
 	GLuint colors_vbo;
-	glCreateBuffers(1, &colors_vbo);
+	glGenBuffers(1, &colors_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
 	glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(float), colors.data(), GL_STATIC_DRAW);
 

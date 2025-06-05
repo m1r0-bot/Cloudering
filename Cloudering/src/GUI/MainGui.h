@@ -32,4 +32,9 @@ private:
 
 	void MouseCameraHandeler();
 	void HandleShortcuts();
+
+
+
+	// This is just to make the class diagram show the dependency
+	Renderer* getInstance;
 };

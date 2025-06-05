@@ -8,12 +8,12 @@ void CellularAutomaton::RenderControlerGUI() {
 			ImGui::DragInt("dim Z", &dimZ, 1, 0, 128))
 		{
 			cld = std::vector<uint8_t>(dimX * dimZ, 0);
-			hum.clear();
-			act.clear();
-			for (int i = 0; i < dimZ * dimX; i++) {
+			hum = std::vector<uint8_t>(dimX * dimZ, 0);
+			act = std::vector<uint8_t>(dimX * dimZ, 0);
+			/*for (int i = 0; i < dimZ * dimX; i++) {
 				hum.push_back(std::rand());
 				act.push_back(std::rand());
-			}
+			}*/
 		}
 	}
 

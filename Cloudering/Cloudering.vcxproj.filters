@@ -45,9 +45,6 @@
     <ClCompile Include="src\GUI\MainGui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\tools\FileLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\ShaderProgram.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -119,9 +116,6 @@
     <ClInclude Include="src\GUI\MainGui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\tools\FileLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\core\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -167,5 +161,8 @@
     <ClInclude Include="src\scenarios\Horizon\HorizonTextureGen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

@@ -25,4 +25,8 @@ private:
 	GLuint weatherData = 0;
 
 	glm::vec3 sunPos = vec3(0., 1., 0.);
+	glm::vec3 sunCol = vec3(1.);
+
+	// This is just to make the class diagram show the dependency
+	HorizonTextureGenerator *generateNoises;
 };

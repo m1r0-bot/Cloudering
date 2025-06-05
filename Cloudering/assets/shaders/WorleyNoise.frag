@@ -30,13 +30,13 @@ float Worley(vec2 p, float _mod){
             min_dist = min(min_dist, d);
         }
     }
-    min_dist = clamp(.0, 1., min_dist);
-    return 1.-min_dist;
+    min_dist = clamp(min_dist, .0, 1.);
+    return min_dist;
 }
 
 void main()
 {
-    float r = bool(gridSize.x) ? Worley(fragUV, gridSize.x) : 0.;
+    float r = bool(gridSize.x) ? Worley(fragUV, gridSize.x) : 1.;
     float g = bool(gridSize.y) ? Worley(fragUV, gridSize.y) : 0.;
     float b = bool(gridSize.z) ? Worley(fragUV, gridSize.z) : 0.;
     float a = bool(gridSize.w) ? Worley(fragUV, gridSize.w) : 0.;

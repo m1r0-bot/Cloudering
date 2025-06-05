@@ -23,10 +23,10 @@ struct Ellipsoid {
 class CellularAutomaton {
 public:
 	CellularAutomaton() {
-		for (int i = 0; i < dimZ*dimX; i++) {
+		/*for (int i = 0; i < dimZ*dimX; i++) {
 			hum.push_back( std::rand() );
 			act.push_back( std::rand() );
-		}
+		}*/
 	}
 	void RenderControlerGUI();
 	void TimeStep();
@@ -41,8 +41,8 @@ public:
 	float P_act = 0.1;
 
 private:
-	std::vector<uint8_t> hum;
-	std::vector<uint8_t> act;
+	std::vector<uint8_t> hum = std::vector<uint8_t>(dimX * dimZ, 0);;
+	std::vector<uint8_t> act = std::vector<uint8_t>(dimX * dimZ, 0);;
 	std::vector<uint8_t> cld = std::vector<uint8_t>(dimX * dimZ, 0);
 
 	std::vector<Ellipsoid> ellipsoids = { {{8, 4, 4}, {8, 4, 8}} };

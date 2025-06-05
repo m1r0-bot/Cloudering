@@ -9,4 +9,7 @@
 class ShaderProgram {
 public:
 	static GLuint CreateShaderProgram(std::vector<Shader> shaders);
+
+private:
+	Shader *shaders;
 };

@@ -68,16 +68,13 @@ float dots(vec2 p, float scale){
 void main()
 {
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
-    vec2 uv = vec2(id) / (gl_NumWorkGroups * gl_WorkGroupSize).xy;
+    vec2 uv = vec2(id) / (gl_NumWorkGroups * gl_WorkGroupSize).xy + .5;
     
-    float p = Perlin(uv, 7.)*.5+.5;
-    float p2 = Perlin(uv+7., 10.)*.5+.5;
-    float p3 = Perlin(uv+17.5, 15.)*.5+.5;
-    float d = dots(uv, 10.);
+    float r = Perlin(uv+7., 10.)*.5+.5;
+    float g = 0.03*(Perlin(uv, 7.)*.5+.5);
+    float b = Perlin(uv+17.5, 5.)*.5+.5;
     
-    vec4 colOut = vec4(d, p, .5, 1.);
-    //vec4 colOut = vec4(p2, p, .5, 1.);
-    //vec4 colOut = vec4(p2, p, mix(p3, d, .5), 1.);
+    vec4 colOut = vec4(r, g, b, 1.);
 
     imageStore(noiseTexture, id, colOut);
 }
